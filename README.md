@@ -1,6 +1,6 @@
 # Credits goes to Rubim
 
-Since Rubim been busy I do the updating because im bored.
+I can do the updating since Rubim is been busy
 
 
 

@@ -1,6 +1,7 @@
 # ALL credits goes to Rubim
 
-I can do the updating since Rubim is been busy
+I can do the updating whenb im bored
+
 
 
 

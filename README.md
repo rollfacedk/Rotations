@@ -1,6 +1,6 @@
 # ALL credits goes to Rubim
 
-I can do the updating whenb im bored
+I can do the updating when im bored
 
 
 

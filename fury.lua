@@ -262,7 +262,6 @@ local function APL()
     if S.Whirlwind:IsReady() and Cache.EnemiesCount[8] >= 3 and not Player:BuffP(S.WhirlwindBuff) and S.WhirlwindPassive:IsAvailable() then
         return S.Whirlwind:Cast()
     end
-    end
     -- blood_fury,if=buff.recklessness.up
     if S.BloodFury:IsReady() and RubimRH.CDsON() and (Player:BuffP(S.Recklessness)) then
         return S.BloodFury:Cast()

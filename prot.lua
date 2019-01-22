@@ -1,261 +1,253 @@
---- ============================ HEADER ============================
---- ======= LOCALIZE =======
+--- Last Edit: Bishop - 7/20/18
+--- BfA Protection Warrior v1.0.2
+
+--- Localize Vars
+local RubimRH = LibStub("AceAddon-3.0"):GetAddon("RubimRH")
 -- Addon
-local addonName, addonTable = ...
+local addonName, addonTable = ...;
 -- HeroLib
-local HL = HeroLib
-local Cache = HeroCache
-local Unit = HL.Unit
-local Player = Unit.Player
-local Target = Unit.Target
-local Pet = Unit.Pet
-local Spell = HL.Spell
-local Item = HL.Item
+local HL = HeroLib;
+local Cache = HeroCache;
+local Unit = HL.Unit;
+local Player = Unit.Player;
+local Target = Unit.Target;
+local Spell = HL.Spell;
+local Item = HL.Item;
 
---- ============================ CONTENT ===========================
---- ======= APL LOCALS =======
--- luacheck: max_line_length 9999
-
--- Spells
-RubimRH.Spell[66] = {
-    Seraphim = Spell(152262),
-    ShieldoftheRighteous = Spell(53600),
-    AvengingWrath = Spell(31884),
-    SeraphimBuff = Spell(152262),
-    AvengingWrathBuff = Spell(31884),
-    AvengersValorBuff = Spell(197561),
-    AvengerShield = Spell(31935),
-    LightsJudgment = Spell(255647),
-    AvengersShield = Spell(31935),
-    Judgment = Spell(275779),
-    CrusadersJudgment = Spell(204023),
-    Consecration = Spell(26573),
-    BlessedHammer = Spell(204019),
-    HammeroftheRighteous = Spell(53595),
-    ArdentDefender = Spell(31850),
-    GuardianOfAncientKings = Spell(86659),
-    HandOfTheProtector = Spell(213652),
-    BlessingOfProtection = Spell(1022),
-    BlessingOfSacrifice = Spell(6940),
-    BlessingOfFreedom = Spell(1044),
-    Forbearance = Spell(25771),
-    LayOnHands = Spell(633),
-    ConsecrationBuff = Spell(188370),
-    LightofTheProtector = Spell(184092),
-    ShieldoftheRighteousBuff = Spell(132403),
-
-    InqusitionDebuff = Spell(206891),
-    Inqusition = Spell(207028),
-    HammerofJustice = Spell(853),
-    Rebuke = Spell(96231)
-
-};
-
-local S = RubimRH.Spell[66];
-local G = RubimRH.Spell[1]; -- General Skills
-
--- Items
-if not Item.Paladin then
-    Item.Paladin = {}
-end
-Item.Paladin.Protection = {
-    ProlongedPower = Item(142117)
-};
-local I = Item.Paladin.Protection;
-
-
--- Variables
-
-local EnemyRanges = { 8 }
-local function UpdateRanges()
-    for _, i in ipairs(EnemyRanges) do
-        HL.GetEnemies(i);
-    end
-end
-
-local function num(val)
-    if val then
-        return 1
-    else
-        return 0
-    end
-end
-
-local function bool(val)
-    return val ~= 0
-end
-
-local OffensiveCDs = {
-    S.AvengingWrath
+RubimRH.Spell[73] = {
+    ArcaneTorrent = Spell(69179),
+    Berserking = Spell(26297),
+    BloodFury = Spell(20572),
+    Shadowmeld = Spell(58984),
+    -- Abilities
+    BerserkerRage = Spell(18499),
+    Charge = Spell(100), -- Unused
+    DemoralizingShout = Spell(1160),
+    Devastate = Spell(20243),
+    HeroicLeap = Spell(6544), -- Unused
+    HeroicThrow = Spell(57755), -- Unused
+    Revenge = Spell(6572),
+    RevengeBuff = Spell(5302),
+    ShieldSlam = Spell(23922),
+    ThunderClap = Spell(6343),
+    VictoryRush = Spell(34428),
+    Victorious = Spell(32216),
+    LastStand = Spell(12975),
+    Avatar = Spell(107574),
+    BattleShout = Spell(6673),
+    -- Talents
+    BoomingVoice = Spell(202743),
+    ImpendingVictory = Spell(202168),
+    Shockwave = Spell(46968),
+    CracklingThunder = Spell(203201),
+    Vengeance = Spell(202572),
+    VegeanceIP = Spell(202574),
+    VegeanceRV = Spell(202573),
+    UnstoppableForce = Spell(275336),
+    Ravager = Spell(228920),
+    Bolster = Spell(280001),
+    -- PVP Talents
+    ShieldBash = Spell(198912),
+    -- Defensive
+    IgnorePain = Spell(190456),
+    Pummel = Spell(6552),
+    ShieldBlock = Spell(2565),
+    ShieldBlockBuff = Spell(132404),
+    ShieldWall = Spell(871),
+    Taunt = Spell(355),
+    Opressor = Spell(205800),
+    Intimidated = Spell(206891),
 }
 
-local function ConcerationTime()
-    for i = 1, 5 do
-        local active, totemName, startTime, duration, textureId = GetTotemInfo(i)
-        if active == true then
-            return startTime + duration - GetTime()
-        end
-    end
-    return 0
-end
 
-local function UpdateCDs()
-    if RubimRH.config.cooldown then
-        for i, spell in pairs(OffensiveCDs) do
-            if not spell:IsEnabledCD() then
-                RubimRH.delSpellDisabledCD(spell:ID())
-            end
-        end
+local S = RubimRH.Spell[73]
 
-    end
-    if not RubimRH.config.cooldown then
-        for i, spell in pairs(OffensiveCDs) do
-            if spell:IsEnabledCD() then
-                RubimRH.addSpellDisabledCD(spell:ID())
-            end
-        end
-    end
-end
-
---- ======= ACTION LISTS =======
+--- Preliminary APL based on WoWHead Rotation Priority for 8.0.1
+-- WoWHead Guide Referenced: http://www.wowhead.com/protection-warrior-rotation-guide
 local function APL()
-    local Precombat
-    UpdateRanges()
-    UpdateCDs()
-    Precombat = function()
-        -- flask
-        -- food
-        -- augmentation
-        -- snapshot_stats
-        -- potion
-    end
-    -- call precombat
+    -- Battle Shout -> Re-buff when down
+    -- TODO: Need to wait for GGLoader to include this texture
+    -- if not Player:Buff(ProtSpells.BattleShout) and ProtSpells.BattleShout:IsReady() then return ProtSpells.BattleShout:Cast() end
+
+    -- Player not in combat
     if not Player:AffectingCombat() then
-        if Precombat() ~= nil then
-            return Precombat()
+        if S.BattleShout:IsCastable() and not Player:BuffPvP(S.BattleShout) then
+            return S.BattleShout:Cast()
         end
         return 0, 462338
     end
 
-    if S.Rebuke:IsReady(30) and RubimRH.db.profile.mainOption.useInterrupts and Target:IsInterruptible() then
-        return S.Rebuke:Cast()
+    if QueueSkill() ~= nil then
+        return QueueSkill()
     end
 
-    if (S.LightofTheProtector:IsReady() or S.HandOfTheProtector:IsReady()) and Player:HealthPercentage() <= RubimRH.db.profile[66].sk1 then
-        return S.LightofTheProtector:Cast()
+    -- Update Surrounding Enemies
+    HL.GetEnemies("Melee")
+    HL.GetEnemies(8, true)
+    HL.GetEnemies(10, true)
+    HL.GetEnemies(12, true)
+
+    -- Localize Vars
+    local IsTanking = Player:IsTankingAoE(8) or Player:IsTanking(Target) -- TODO: Implement logic for PvP scenarios : IsTanking returns false, yet Shield Block is still needed
+    local ThunderClapRadius = S.CracklingThunder:IsAvailable() and 12 or 8
+
+    local LeftCtrl = IsLeftControlKeyDown()
+    local LeftShift = IsLeftShiftKeyDown()
+
+    -- Shovkwave -> Cast when left CTRL+Shift keys are pressed
+    if LeftCtrl and LeftShift and S.Shockwave:IsReady(8) then
+        return S.Shockwave:Cast()
     end
 
-    -- auto_attack
-    -- seraphim,if=cooldown.shield_of_the_righteous.charges_fractional>=2
-    if S.Seraphim:IsReady() and (S.ShieldoftheRighteous:ChargesFractional() >= 2) then
-        return S.Seraphim:Cast()
-    end
-    -- avenging_wrath,if=buff.seraphim.up|cooldown.seraphim.remains<2|!talent.seraphim.enabled
-    if S.AvengingWrath:IsReady() and (Player:Buff(S.SeraphimBuff) or S.Seraphim:CooldownRemains() < 2 or not S.Seraphim:IsAvailable()) then
-        return S.AvengingWrath:Cast()
+    -- Pummel -> 0.5 sec of cast has elapsed, or 1 second of channeling has elapsed
+    if S.Pummel:IsReady() and Target:IsInterruptible() and RubimRH.InterruptsON() then
+        return S.Pummel:Cast()
     end
 
-    -- Mouseover Functionality
-    local MouseoverUnit = (UnitExists("mouseover") and UnitIsFriend("player", "mouseover") and (UnitGUID("mouseover") ~= UnitGUID("player"))) and Unit("mouseover") or nil
-    if MouseoverUnit then
-        -- Hand of the Protector -> Mouseover
-        if S.HandOfTheProtector:IsReady()
-                and MouseoverUnit:NeedMajorHealing() then
-            return S.HandOfTheProtector:Cast()
-        end
-
-        -- Blessing of Protection -> Mousover
-        if S.BlessingOfProtection:IsReady()
-                and MouseoverUnitNeedsBoP then
-            return S.BlessingOfProtection:Cast()
-        end
+    if S.BattleShout:IsCastable() and not Player:BuffPvP(S.BattleShout) then
+        return S.BattleShout:Cast()
     end
 
-    --    Blessing Of Sacrifice
-    local MouseoverUnitNeedsBlessingOfSacrifice = (MouseoverUnitValid and Player:HealthPercentage() <= 80) and true or false
-    if MouseoverUnitNeedsBlessingOfSacrifice and S.BlessingOfSacrifice:IsReady(40, false, MouseoverUnit) then
-        return S.BlessingOfSacrifice:Cast()
+    if Player:NeedThreat() and S.ThunderClap:IsReady() and Cache.EnemiesCount[8] >= 1 then
+        return S.ThunderClap:Cast()
     end
 
-    -- Blessing of Freedom -> if snared
-    if Player:IsSnared()
-            and S.BlessingOfFreedom:IsReady() then
-        return S.BlessingOfFreedom:Cast()
+    -- Shield Bash -> PvP usage
+    if S.ShieldBash:IsReady("Melee")
+            and Target:IsCasting() then
+        return S.ShieldBash:Cast()
+    end
+    -- TODO: Berserker Rage: Implement cast while feared.
+
+    -- Shield Wall -> Panic Heal
+    if S.ShieldWall:IsCastable("Melee")
+            and (Player:HealthPercentage() <= 30)
+            and (S.Bolster:IsAvailable() and (not Player:Buff((S).LastStand))) then
+        return S.ShieldWall:Cast()
     end
 
--- Rotation
+    -- Last Stand -> Panic Heal
+    if S.LastStand:IsCastable("Melee")
+            and (Player:HealthPercentage() <= 50)
+            and (not Player:Buff(S.ShieldWall)) then
+        return S.LastStand:Cast()
+    end
 
-    -- shield_of_the_righteous,if=(buff.avengers_valor.up&cooldown.shield_of_the_righteous.charges_fractional>=2.5)&(cooldown.seraphim.remains>gcd|!talent.seraphim.enabled)
-    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengersValorBuff) and S.ShieldoftheRighteous:ChargesFractionalP() >= 2.5) and (S.Seraphim:CooldownRemainsP() > Player:GCD() or not S.Seraphim:IsAvailable())) then
-        return S.ShieldoftheRighteous:Cast()
+    -- Shield Block -> Primary rage dump
+    if S.ShieldBlock:IsCastable("Melee")
+            and Player:Rage() >= 30
+            and not Player:Buff(S.ShieldBlockBuff)
+            and ((not S.Bolster:IsAvailable())
+            or (S.Bolster:IsAvailable() and not Player:Buff(S.LastStand)))
+            and S.ShieldBlock:ChargesFractional() >= 1
+            and Player:HealthPercentage() <= 85 then
+        return S.ShieldBlock:Cast()
     end
-    -- shield_of_the_righteous,if=(buff.avenging_wrath.up&!talent.seraphim.enabled)|buff.seraphim.up&buff.avengers_valor.up
-    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:BuffP(S.SeraphimBuff) and Player:BuffP(S.AvengersValorBuff))  then
-        return S.ShieldoftheRighteous:Cast()
+
+    -- Avatar -> Cast when not in a group (solo conent), Target TTD >= 10, and we're at >= 20 rage deficit
+    if S.Avatar:IsCastable("Melee")
+            and RubimRH.CDsON() then
+        return S.Avatar:Cast()
     end
-    -- shield_of_the_righteous,if=(buff.avenging_wrath.up&buff.avenging_wrath.remains<4&!talent.seraphim.enabled)|(buff.seraphim.remains<4&buff.seraphim.up)
-    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) < 4 and not S.Seraphim:IsAvailable()) or (Player:BuffRemainsP(S.SeraphimBuff) < 4 and Player:BuffP(S.SeraphimBuff))) then
-        return S.ShieldoftheRighteous:Cast()
+
+    -- Demoralizing Shout -> Use on CD with Boomking Shout
+    if ((S.BoomingVoice:IsCastable() and Player:Rage() <= 60)
+            or (Cache.EnemiesCount[ThunderClapRadius] >= 3 and Player:Rage() <= 60)
+            or (GetNumGroupMembers() == 0))
+            and S.DemoralizingShout:IsReady("Melee") then
+        return S.DemoralizingShout:Cast()
     end
-    -- lights_judgment,if=buff.seraphim.up&buff.seraphim.remains<3
-    if S.LightsJudgment:IsCastableP() and RubimRH.CDsON() and (Player:BuffP(S.SeraphimBuff) and Player:BuffRemainsP(S.SeraphimBuff) < 3) then
-        return S.LightsJudgment:Cast()
+
+    -- Impending Victory -> Cast when < 85% HP
+    if S.ImpendingVictory:IsReady("Melee")
+            and Player:HealthPercentage() <= 85 then
+        return S.VictoryRush:Cast()
     end
-    -- consecration,if=!consecration.up
-    if S.Consecration:IsCastableP() and (not Player:BuffP(S.ConsecrationBuff)) then
-        return S.Consecration:Cast()
+
+    -- Victory Rush -> Cast when < 85% HP
+    if Player:Buff(S.Victorious)
+            and S.VictoryRush:IsReady("Melee")
+            and Player:HealthPercentage() <= 85 then
+        return S.VictoryRush:Cast()
     end
-    -- judgment,if=(cooldown.judgment.remains<gcd&cooldown.judgment.charges_fractional>1&cooldown_react)|!talent.crusaders_judgment.enabled
-    if S.Judgment:IsCastableP() and ((S.Judgment:CooldownRemainsP() < Player:GCD() and S.Judgment:ChargesFractionalP() > 1 and S.Judgment:CooldownUpP()) or not S.CrusadersJudgment:IsAvailable()) then
-        return S.Judgment:Cast()
+
+    if S.Revenge:IsReady("Melee")
+            and Player:RageDeficit() <= 15 then
+        return S.Revenge:Cast()
     end
-    -- avengers_shield,if=cooldown_react
-    if S.AvengersShield:IsCastableP() and (S.AvengersShield:CooldownUpP()) then
-        return S.AvengersShield:Cast()
+
+    -- Shield Slam
+    if S.ShieldSlam:IsReady("Melee")
+            and Player:RageDeficit() >= 15 then
+        return S.ShieldSlam:Cast()
     end
-    -- judgment,if=cooldown_react|!talent.crusaders_judgment.enabled
-    if S.Judgment:IsCastableP() and (S.Judgment:CooldownUpP() or not S.CrusadersJudgment:IsAvailable()) then
-        return S.Judgment:Cast()
+
+    -- ThunderClap
+    if S.ThunderClap:IsReady() and Player:RageDeficit() >= 5 and Cache.EnemiesCount[8] >= 1 then
+        return S.ThunderClap:Cast()
     end
-    -- lights_judgment,if=!talent.seraphim.enabled|buff.seraphim.up
-    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) then
-        return S.LightsJudgment:Cast()
+
+    -- Revenge Rage Dump
+    local RevengeDumpRage = S.BoomingVoice:IsAvailable() and 60 or 80
+    if S.Revenge:IsReady("Melee")
+            and (((Player:Rage() >= RevengeDumpRage)
+            or Player:Buff(S.RevengeBuff))
+            or (S.Revenge:IsReady("Melee") and Player:Buff(S.VegeanceRV) and Player:Rage() >= 20)) then
+        return S.Revenge:Cast()
     end
-    -- blessed_hammer,strikes=3
-    if S.BlessedHammer:IsCastableP() then
-        return S.BlessedHammer:Cast()
+
+    -- Ravager -> AoE scenarios
+    if S.Ravager:IsReady("Melee")
+            and Cache.EnemiesCount[8] >= 3 then
+        return S.Ravager:Cast()
     end
-    -- hammer_of_the_righteous
-    if S.HammeroftheRighteous:IsCastableP() then
-        return S.HammeroftheRighteous:Cast()
+
+    -- Shield Bash -> Target not casting / lower priority
+--    if S.ShieldBash:IsReady("Melee") then
+--        return S.ShieldBash:Cast()
+    --end
+
+    -- Ignore Pain -> Vengeance Ignore Pain
+    if S.IgnorePain:IsCastable("Melee")
+            and Player:Buff(S.VegeanceIP)
+            and Player:Rage() >= ((40 / 3) * 2)
+            and not Player:Buff(S.IgnorePain) then
+        return S.IgnorePain:Cast()
     end
-    -- consecration
-    if S.Consecration:IsCastableP()  then
-        return S.Consecration:Cast()
+
+    -- Revenge -> Rage dump
+    if S.Revenge:IsReady("Melee")
+            and S.ShieldBlock:ChargesFractional() < 0.6
+            and Player:Rage() >= 30 then
+        return S.Revenge:Cast()
     end
+
+    -- Victory Rush -> Buff about to expire
+    if Player:Buff(S.Victorious)
+            and Player:BuffRemains(S.Victorious) <= 2
+            and S.VictoryRush:IsReady("Melee") then
+        return S.VictoryRush:Cast()
+    end
+
+    -- Ignore Pain -> Only cast in place of Devastate
+    if S.IgnorePain:IsCastable("Melee")
+            and Player:Rage() >= 40
+            and not Player:Buff(S.IgnorePain)
+            and (Player:HealthPercentage() <= 85) then
+        -- TODO: See IsTanking note
+        return S.IgnorePain:Cast()
+    end
+
+    if S.Devastate:IsReady("Melee") then
+        return S.Devastate:Cast()
+    end
+
     return 0, 135328
 end
-
-RubimRH.Rotation.SetAPL(66, APL)
+RubimRH.Rotation.SetAPL(73, APL);
 
 local function PASSIVE()
-
-    -- TODO: Restore these when GGLoader texture updates are complete
-    -- Lay on Hands
-    if S.LayOnHands:IsReady() and Player:HealthPercentage() <= RubimRH.db.profile[66].sk4 and not Player:Debuff(S.Forbearance) and not Player:Buff(S.ArdentDefender) and not Player:Buff(S.GuardianOfAncientKings) then
-        return S.LayOnHands:Cast()
-    end
-
-    -- Guardian of Ancient Kings -> Use on Panic Heals, should be proactively cast by user
-    if S.GuardianOfAncientKings:IsReady() and Player:HealthPercentage() < RubimRH.db.profile[66].sk3 and not Player:Buff(S.ArdentDefender) then
-        return S.GuardianOfAncientKings:Cast()
-    end
-
-    -- Ardent Defender -> Ardent defender @ Player:NeedPanicHealing() <= 90% HP, should be proactively cast by the
-    if S.ArdentDefender:IsReady() and Player:HealthPercentage() <= RubimRH.db.profile[66].sk2 and not Player:Buff(S.GuardianOfAncientKings) then
-        return S.ArdentDefender:Cast()
-    end
-
     return RubimRH.Shared()
 end
-RubimRH.Rotation.SetPASSIVE(66, PASSIVE)
+
+RubimRH.Rotation.SetPASSIVE(73, PASSIVE);

@@ -186,51 +186,51 @@ local function APL()
 -- Rotation
 
     -- shield_of_the_righteous,if=(buff.avengers_valor.up&cooldown.shield_of_the_righteous.charges_fractional>=2.5)&(cooldown.seraphim.remains>gcd|!talent.seraphim.enabled)
-    if S.ShieldoftheRighteous:IsReady() and ((Player:Buff(S.AvengersValorBuff) and S.ShieldoftheRighteous:ChargesFractional() >= 2.5) and (S.Seraphim:CooldownRemains() > Player:GCD() or not S.Seraphim:IsAvailable())) then
+    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengersValorBuff) and S.ShieldoftheRighteous:ChargesFractionalP() >= 2.5) and (S.Seraphim:CooldownRemainsP() > Player:GCD() or not S.Seraphim:IsAvailable())) then
         return S.ShieldoftheRighteous:Cast()
     end
     -- shield_of_the_righteous,if=(buff.avenging_wrath.up&!talent.seraphim.enabled)|buff.seraphim.up&buff.avengers_valor.up
-    if S.ShieldoftheRighteous:IsReady() and ((Player:Buff(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:Buff(S.SeraphimBuff) and Player:Buff(S.AvengersValorBuff)) then
+    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengingWrathBuff) and not S.Seraphim:IsAvailable()) or Player:BuffP(S.SeraphimBuff) and Player:BuffP(S.AvengersValorBuff))  then
         return S.ShieldoftheRighteous:Cast()
     end
     -- shield_of_the_righteous,if=(buff.avenging_wrath.up&buff.avenging_wrath.remains<4&!talent.seraphim.enabled)|(buff.seraphim.remains<4&buff.seraphim.up)
-    if S.ShieldoftheRighteous:IsReady() and ((Player:Buff(S.AvengingWrathBuff) and Player:BuffRemains(S.AvengingWrathBuff) < 4 and not S.Seraphim:IsAvailable()) or (Player:BuffRemains(S.SeraphimBuff) < 4 and Player:Buff(S.SeraphimBuff))) then
+    if S.ShieldoftheRighteous:IsCastableP() and ((Player:BuffP(S.AvengingWrathBuff) and Player:BuffRemainsP(S.AvengingWrathBuff) < 4 and not S.Seraphim:IsAvailable()) or (Player:BuffRemainsP(S.SeraphimBuff) < 4 and Player:BuffP(S.SeraphimBuff))) then
         return S.ShieldoftheRighteous:Cast()
     end
     -- lights_judgment,if=buff.seraphim.up&buff.seraphim.remains<3
-    if S.LightsJudgment:IsReady() and Player:Buff(S.SeraphimBuff) and Player:BuffRemains(S.SeraphimBuff) < 3 then
+    if S.LightsJudgment:IsCastableP() and RubimRH.CDsON() and (Player:BuffP(S.SeraphimBuff) and Player:BuffRemainsP(S.SeraphimBuff) < 3) then
         return S.LightsJudgment:Cast()
     end
     -- consecration,if=!consecration.up
-    if S.Consecration:IsReady() and not Player:Buff(S.ConsecrationBuff) then
+    if S.Consecration:IsCastableP() and (not Player:BuffP(S.ConsecrationBuff)) then
         return S.Consecration:Cast()
     end
     -- judgment,if=(cooldown.judgment.remains<gcd&cooldown.judgment.charges_fractional>1&cooldown_react)|!talent.crusaders_judgment.enabled
-    if S.Judgment:IsReady() and ((S.Judgment:CooldownRemains() < Player:GCD() and S.Judgment:ChargesFractional() > 1) or not S.CrusadersJudgment:IsAvailable()) then
+    if S.Judgment:IsCastableP() and ((S.Judgment:CooldownRemainsP() < Player:GCD() and S.Judgment:ChargesFractionalP() > 1 and S.Judgment:CooldownUpP()) or not S.CrusadersJudgment:IsAvailable()) then
         return S.Judgment:Cast()
     end
     -- avengers_shield,if=cooldown_react
-    if S.AvengersShield:IsReady() then
+    if S.AvengersShield:IsCastableP() and (S.AvengersShield:CooldownUpP()) then
         return S.AvengersShield:Cast()
     end
     -- judgment,if=cooldown_react|!talent.crusaders_judgment.enabled
-    if S.Judgment:IsReady() then
+    if S.Judgment:IsCastableP() and (S.Judgment:CooldownUpP() or not S.CrusadersJudgment:IsAvailable()) then
         return S.Judgment:Cast()
     end
     -- lights_judgment,if=!talent.seraphim.enabled|buff.seraphim.up
-    if S.LightsJudgment:IsReady() and RubimRH.CDsON() and (not S.Seraphim:IsAvailable() or Player:Buff(S.SeraphimBuff)) then
+    if S.LightsJudgment:IsCastableP() and HR.CDsON() and (not S.Seraphim:IsAvailable() or Player:BuffP(S.SeraphimBuff)) then
         return S.LightsJudgment:Cast()
     end
     -- blessed_hammer,strikes=3
-    if S.BlessedHammer:IsReady() then
+    if S.BlessedHammer:IsCastableP() then
         return S.BlessedHammer:Cast()
     end
     -- hammer_of_the_righteous
-    if S.HammeroftheRighteous:IsReady() then
+    if S.HammeroftheRighteous:IsCastableP() then
         return S.HammeroftheRighteous:Cast()
     end
     -- consecration
-    if S.Consecration:IsReady()  then
+    if S.Consecration:IsCastableP()  then
         return S.Consecration:Cast()
     end
     return 0, 135328

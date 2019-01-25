@@ -185,7 +185,7 @@ local function APL()
         end
         -- shield_of_vengeance
         -- avenging_wrath,if=buff.inquisition.up|!talent.inquisition.enabled
-        if S.AvengingWrath:IsReady() and (Player:BuffP(S.Inquisition) or not S.Inquisition:IsAvailable()) then
+        if S.AvengingWrath:IsReady('Melee') and (Player:BuffRemainsP(S.Inquisition) > 20 or not S.Inquisition:IsAvailable()) then
             return S.AvengingWrath:Cast()
         end
         -- crusade,if=holy_power>=4
@@ -193,7 +193,7 @@ local function APL()
             return S.Crusade:Cast()
         end
     end
-    --varDSCastable = RubimRH.AoEON() and (Cache.EnemiesCount[8] >= 3 or (not S.RighteousVerdict:IsAvailable() and S.DivineJudgement:IsAvailable() and Cache.EnemiesCount[8] >= 2) or (S.DivineRight:AzeriteEnabled() and Target:HealthPercentage() <= 20 and not Player:Buff(S.DivineStormBuffAzerite)))
+    --varDSCastable = RubimRH.AzoEON() and (Cache.EnemiesCount[8] >= 3 or (not S.RighteousVerdict:IsAvailable() and S.DivineJudgement:IsAvailable() and Cache.EnemiesCount[8] >= 2) or (S.DivineRight:AzeriteEnabled() and Target:HealthPercentage() <= 20 and not Player:Buff(S.DivineStormBuffAzerite)))
     Finishers = function()
         -- variable,name=ds_castable,value=spell_targets.divine_storm>=2&!talent.righteous_verdict.enabled|spell_targets.divine_storm>=3&talent.righteous_verdict.enabled
         VarDsCastable = (Cache.EnemiesCount[8] >= 2 and not S.RighteousVerdict:IsAvailable() or Cache.EnemiesCount[8] >= 3 and S.RighteousVerdict:IsAvailable())
@@ -210,7 +210,7 @@ local function APL()
             return S.DivineStorm:Cast()
         end
         -- divine_storm,if=variable.ds_castable&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*2)|buff.empyrean_power.up&debuff.judgment.down&buff.divine_purpose.down
-        if S.DivineStorm:IsReady() and ((VarDsCastable) and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemainsP() > Player:GCD() * 2)) or Player:BuffP(S.EmpyreanPowerBuffAzerite) and (not Target:DebuffP(S.JudgmentDebuff)) and Player:BuffDownP(S.DivinePurposeBuff)  then
+        if S.DivineStorm:IsReady() and ((VarDsCastable) and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemainsP() > Player:GCD() * 2)) or Player:BuffP(S.EmpyreanPowerBuffAzerite) and  Target:DebuffDownP(S.JudgmentDebuff) and Player:BuffDownP(S.DivinePurposeBuff)  then
             return S.DivineStorm:Cast()
         end
         -- templars_verdict,if=buff.divine_purpose.react
@@ -218,7 +218,7 @@ local function APL()
             return S.TemplarsVerdict:Cast()
         end
         -- templars_verdict,if=(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence.enabled|buff.crusade.up&buff.crusade.stack<10|cooldown.execution_sentence.remains>gcd*2)
-        if S.TemplarsVerdict:IsReady() and ((not S.Crusade:IsAvailable() or S.Crusade:CooldownRemainsP() > Player:GCD() * 3) and (not S.ExecutionSentence:IsAvailable() or Player:BuffP(S.Crusade) and Player:BuffStackP(S.Crusade) < 10 or S.ExecutionSentence:CooldownRemainsP() > Player:GCD() * 2)) then
+        if S.TemplarsVerdict:IsReady() and (not S.Crusade:IsAvailable() or S.Crusade:CooldownRemainsP() > Player:GCD() * 3) and (not S.ExecutionSentence:IsAvailable() or Player:BuffP(S.Crusade) and Player:BuffStackP(S.Crusade) < 10 or S.ExecutionSentence:CooldownRemainsP() > Player:GCD() * 2) then
             return S.TemplarsVerdict:Cast()
         end
     end

@@ -130,7 +130,6 @@ local OffensiveCDs = {
     S.AMurderofCrows,
 
     -- Racial
-    
 
     S.AncestralCall,
     S.Fireblood,
@@ -353,8 +352,6 @@ local function APL()
         local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
       end
     end
-    
-    
     return 0, 135328
 end
 

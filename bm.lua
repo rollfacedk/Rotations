@@ -123,7 +123,39 @@ local function UpdateRanges()
   end
 end
 
+local OffensiveCDs = {
+    S.AspectoftheWild,
+    S.SpittingCobra,
+    S.Stampede,
+    S.AMurderofCrows,
 
+    -- Racial
+    
+
+    S.AncestralCall,
+    S.Fireblood,
+    S.Berserking,
+    S.BloodFury,
+    S.LightsJudgment
+}
+
+local function UpdateCDs()
+    if RubimRH.CDsON() then
+        for i, spell in pairs(OffensiveCDs) do
+            if not spell:IsEnabledCD() then
+                RubimRH.delSpellDisabledCD(spell:ID())
+            end
+        end
+
+    end
+    if not RubimRH.CDsON() then
+        for i, spell in pairs(OffensiveCDs) do
+            if spell:IsEnabledCD() then
+                RubimRH.addSpellDisabledCD(spell:ID())
+            end
+        end
+    end
+end
 
 local function num(val)
     if val then
@@ -144,6 +176,7 @@ end
 --- APL Main
 local function APL()
     local Precombat, Cds, Cleave, St
+    UpdateCDs()
     UpdateRanges()
     cacheOverwrite()
     Precombat = function()
@@ -203,7 +236,7 @@ local function APL()
         return S.BarbedShot:Cast()
       end
       -- aspect_of_the_wild
-      if S.AspectoftheWild:IsReady() and RubimRH.CDsON() then
+      if S.AspectoftheWild:IsReady() then
         return S.AspectoftheWild:Cast()
       end
       -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
@@ -254,7 +287,7 @@ local function APL()
         return S.BarbedShot:Cast()
       end
       -- aspect_of_the_wild
-      if S.AspectoftheWild:IsReady() and RubimRH.CDsON() then
+      if S.AspectoftheWild:IsReady() then
         return S.AspectoftheWild:Cast()
       end
       -- a_murder_of_crows

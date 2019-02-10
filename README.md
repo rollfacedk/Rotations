@@ -6,7 +6,7 @@ So since Rubim is been AFK for a while I'm going to update every specs for the c
 
 
 
-Feel free to donate and msg me on my discord Raider Lazer#4425 
+Feel free to donate it will give me motivation and you can msg me on my discord Raider Lazer#4425 
 
 
 https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EDNMZ8A8CLBM2&currency_code=CAD&source=url

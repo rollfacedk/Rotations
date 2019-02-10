@@ -112,6 +112,10 @@ local function APL()
         return S.ThunderClap:Cast()
     end
 
+    if Player:NeedThreat() and S.Revenge:IsReady() and Cache.EnemiesCount[8] >= 1 then
+        return S.Revenge:Cast()
+    end
+
     -- Shield Bash -> PvP usage
     if S.ShieldBash:IsReady("Melee")
             and Target:IsCasting() then
@@ -121,14 +125,14 @@ local function APL()
 
     -- Shield Wall -> Panic Heal
     if S.ShieldWall:IsCastable("Melee")
-            and (Player:HealthPercentage() <= 30)
+            and ((Player:IncDmgPercentage() > RubimRH.db.profile[73].sk2 or Player:HealthPercentage() <= 85) or (Player:IncDmgPercentage() > RubimRH.db.profile[73].sk3 or Player:HealthPercentage() <= 85))
             and (S.Bolster:IsAvailable() and (not Player:Buff((S).LastStand))) then
         return S.ShieldWall:Cast()
     end
 
     -- Last Stand -> Panic Heal
     if S.LastStand:IsCastable("Melee")
-            and (Player:HealthPercentage() <= 50)
+            and ((Player:IncDmgPercentage() > RubimRH.db.profile[73].sk3 or Player:HealthPercentage() <= 85) or (Player:IncDmgPercentage() > RubimRH.db.profile[73].sk2 or Player:HealthPercentage() <= 85))
             and (not Player:Buff(S.ShieldWall)) then
         return S.LastStand:Cast()
     end
@@ -140,19 +144,22 @@ local function APL()
             and ((not S.Bolster:IsAvailable())
             or (S.Bolster:IsAvailable() and not Player:Buff(S.LastStand)))
             and S.ShieldBlock:ChargesFractional() >= 1
-            and Player:HealthPercentage() <= 85 then
+            and ((Player:IncDmgPercentage() > RubimRH.db.profile[73].sk1 or Player:HealthPercentage() <= 85)
+            or (Player:IncDmgPercentage() > RubimRH.db.profile[73].sk2 or Player:HealthPercentage() <= 85)
+            or (Player:IncDmgPercentage() > RubimRH.db.profile[73].sk3 or Player:HealthPercentage() <= 85)) then
         return S.ShieldBlock:Cast()
     end
 
     -- Avatar -> Cast when not in a group (solo conent), Target TTD >= 10, and we're at >= 20 rage deficit
     if S.Avatar:IsCastable("Melee")
-            and RubimRH.CDsON() then
+            and ((Target:TimeToDie() >= 10) or (GetNumGroupMembers() == 0)) -- Use all the time in solo content
+            and Player:RageDeficit() >= 20 then
         return S.Avatar:Cast()
     end
 
     -- Demoralizing Shout -> Use on CD with Boomking Shout
     if ((S.BoomingVoice:IsCastable() and Player:Rage() <= 60)
-            or (Cache.EnemiesCount[ThunderClapRadius] >= 3 and Player:Rage() <= 60)
+            or (Cache.EnemiesCount[ThunderClapRadius] >= 3)
             or (GetNumGroupMembers() == 0))
             and S.DemoralizingShout:IsReady("Melee") then
         return S.DemoralizingShout:Cast()
@@ -233,7 +240,7 @@ local function APL()
     if S.IgnorePain:IsCastable("Melee")
             and Player:Rage() >= 40
             and not Player:Buff(S.IgnorePain)
-            and (Player:HealthPercentage() <= 85) then
+            and ((Player:IncDmgPercentage() > RubimRH.db.profile[73].sk1 or Player:HealthPercentage() <= 85) or (Player:IncDmgPercentage() > RubimRH.db.profile[73].sk2 or Player:HealthPercentage() <= 85)) then
         -- TODO: See IsTanking note
         return S.IgnorePain:Cast()
     end

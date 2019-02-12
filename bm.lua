@@ -26,6 +26,7 @@ mainAddon.Spell[253] = {
     Fireblood = Spell(265221),
     GiftoftheNaaru = Spell(59547),
     LightsJudgment = Spell(255647),
+    Shadowmeld = Spell(58984),
     -- Pet
     CallPet = Spell(883),
     MendPet = Spell(136),
@@ -127,7 +128,6 @@ local OffensiveCDs = {
     S.AspectoftheWild,
     S.SpittingCobra,
     S.Stampede,
-    S.AMurderofCrows,
 
     -- Racial
 
@@ -178,6 +178,9 @@ local function APL()
     UpdateCDs()
     UpdateRanges()
     cacheOverwrite()
+    if Player:BuffP(S.FeignDeath) or Player:BuffP(S.Shadowmeld) then
+        return 0, "Interface\\Addons\\Rubim-RH\\Media\\channel.tga"
+    end
     Precombat = function()
         -- mendpet
         if S.MendPet:IsCastable() and Pet:IsActive() and Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= mainAddon.db.profile[253].sk1 and not Pet:Buff(S.MendPet) then
@@ -200,30 +203,30 @@ local function APL()
     end
     Cds = function()
       -- ancestral_call,if=cooldown.bestial_wrath.remains>30
-      if S.AncestralCall:IsReady() and RubimRH.CDsON() and (S.BestialWrath:CooldownRemainsP() > 30) then
+      if S.AncestralCall:IsReady() and (S.BestialWrath:CooldownRemainsP() > 30) then
         return S.AncestralCall:Cast()
       end
       -- fireblood,if=cooldown.bestial_wrath.remains>30
-      if S.Fireblood:IsReady() and RubimRH.CDsON() and (S.BestialWrath:CooldownRemainsP() > 30) then
+      if S.Fireblood:IsReady() and (S.BestialWrath:CooldownRemainsP() > 30) then
        return S.Fireblood:Cas()
       end
       -- berserking,if=buff.aspect_of_the_wild.up&(target.time_to_die>cooldown.berserking.duration+duration|(target.health.pct<35|!talent.killer_instinct.enabled))|target.time_to_die<13
-      if S.Berserking:IsReady() and RubimRH.CDsON() and (Player:BuffP(S.AspectoftheWildBuff) and (Target:TimeToDie() > S.Berserking:BaseDuration() + S.BerserkingBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:TimeToDie() < 13) then
+      if S.Berserking:IsReady()  and (Player:BuffP(S.AspectoftheWildBuff) and (Target:TimeToDie() > S.Berserking:BaseDuration() + S.BerserkingBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:TimeToDie() < 13) then
         return S.Berserking:Cast()
       end
       -- blood_fury,if=buff.aspect_of_the_wild.up&(target.time_to_die>cooldown.blood_fury.duration+duration|(target.health.pct<35|!talent.killer_instinct.enabled))|target.time_to_die<16
-      if S.BloodFury:IsReady() and RubimRH.CDsON() and (Player:BuffP(S.AspectoftheWildBuff) and (Target:TimeToDie() > S.BloodFury:BaseDuration() + S.BloodFuryBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:TimeToDie() < 16) then
+      if S.BloodFury:IsReady() and (Player:BuffP(S.AspectoftheWildBuff) and (Target:TimeToDie() > S.BloodFury:BaseDuration() + S.BloodFuryBuff:BaseDuration() or (Target:HealthPercentage() < 35 or not S.KillerInstinct:IsAvailable())) or Target:TimeToDie() < 16) then
         return S.BloodFury:Cast()
       end
       -- lights_judgment,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains>gcd.max|!pet.cat.buff.frenzy.up
-      if S.LightsJudgment:IsReady() and RubimRH.CDsON() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) > Player:GCD() or not Pet:BuffP(S.FrenzyBuff)) then
+      if S.LightsJudgment:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) > Player:GCD() or not Pet:BuffP(S.FrenzyBuff)) then
         return S.LightsJudgment:Cast() 
       end
       -- potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up&(target.health.pct<35|!talent.killer_instinct.enabled)|target.time_to_die<25
     end
     Cleave = function()
       -- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
-      if S.BarbedShot:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD * 1.5()) then
+      if S.BarbedShot:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD() * 1.5) then
         return S.BarbedShot:Cast()
       end
       -- multishot,if=gcd.max-pet.cat.buff.beast_cleave.remains>0.25
@@ -251,7 +254,7 @@ local function APL()
         return S.ChimaeraShot:Cast()
       end
       -- a_murder_of_crows
-      if S.AMurderofCrows:IsReady() and RubimRH.CDsON() then
+      if S.AMurderofCrows:IsReady() then
         return S.AMurderofCrows:Cast()
       end
       -- barrage
@@ -275,14 +278,14 @@ local function APL()
         return S.CobraShot:Cast()
       end
       -- spitting_cobra
-      if S.SpittingCobra:IsReady() and RubimRH.CDsON() then
+      if S.SpittingCobra:IsReady()  then
         return S.SpittingCobra:Cast()
       end
     end
     
     St = function()
       -- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max|full_recharge_time<gcd.max&cooldown.bestial_wrath.remains|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd
-      if S.BarbedShot:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD() * 1.5 or S.BarbedShot:FullRechargeTimeP() < Player:GCD() and bool(S.BestialWrath:CooldownRemainsP()) or S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemainsP() < Player:GCD()) then
+      if S.BarbedShot:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD() * 1.5 or S.BarbedShot:FullRechargeTimeP() < Player:GCD() and (S.BestialWrath:CooldownRemainsP()) or S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemainsP() < Player:GCD()) then
         return S.BarbedShot:Cast()
       end
       -- aspect_of_the_wild
@@ -290,11 +293,11 @@ local function APL()
         return S.AspectoftheWild:Cast()
       end
       -- a_murder_of_crows
-      if S.AMurderofCrows:IsReady() and RubimRH.CDsON() then
+      if S.AMurderofCrows:IsReady()  then
         return S.AMurderofCrows:Cast()
       end
       -- stampede,if=buff.aspect_of_the_wild.up&buff.bestial_wrath.up|target.time_to_die<15
-      if S.Stampede:IsReady() and RubimRH.CDsON() and (Player:BuffP(S.AspectoftheWildBuff) and Player:BuffP(S.BestialWrathBuff) or Target:TimeToDie() < 15) then
+      if S.Stampede:IsReady()  and (Player:BuffP(S.AspectoftheWildBuff) and Player:BuffP(S.BestialWrathBuff) or Target:TimeToDie() < 15) then
         return S.Stampede:Cast()
       end
       -- bestial_wrath,if=cooldown.aspect_of_the_wild.remains>20|target.time_to_die<15
@@ -326,7 +329,7 @@ local function APL()
         return S.CobraShot:Cast()
       end
       -- spitting_cobra
-      if S.SpittingCobra:IsReady() and RubimRH.CDsON() then
+      if S.SpittingCobra:IsReady() then
         return S.SpittingCobra:Cast()
       end
     end

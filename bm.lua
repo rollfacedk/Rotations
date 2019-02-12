@@ -223,7 +223,7 @@ local function APL()
     end
     Cleave = function()
       -- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
-      if S.BarbedShot:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD()) then
+      if S.BarbedShot:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD * 1.5()) then
         return S.BarbedShot:Cast()
       end
       -- multishot,if=gcd.max-pet.cat.buff.beast_cleave.remains>0.25
@@ -282,7 +282,7 @@ local function APL()
     
     St = function()
       -- barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max|full_recharge_time<gcd.max&cooldown.bestial_wrath.remains|azerite.primal_instincts.enabled&cooldown.aspect_of_the_wild.remains<gcd
-      if S.BarbedShot:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD() or S.BarbedShot:FullRechargeTimeP() < Player:GCD() and bool(S.BestialWrath:CooldownRemainsP()) or S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemainsP() < Player:GCD()) then
+      if S.BarbedShot:IsReady() and (Pet:BuffP(S.FrenzyBuff) and Pet:BuffRemainsP(S.FrenzyBuff) <= Player:GCD() * 1.5 or S.BarbedShot:FullRechargeTimeP() < Player:GCD() and bool(S.BestialWrath:CooldownRemainsP()) or S.PrimalInstincts:AzeriteEnabled() and S.AspectoftheWild:CooldownRemainsP() < Player:GCD()) then
         return S.BarbedShot:Cast()
       end
       -- aspect_of_the_wild

@@ -321,7 +321,7 @@ local function APL()
             return S.DeathSweep:Cast()
         end
         -- eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
-        if S.EyeBeam:IsCastableP() and ((Cache.EnemiesCount[20] > 1) or 10000000000 > 25) then
+        if S.EyeBeam:IsReady() and ((Cache.EnemiesCount[20] > 1) or 10000000000 > 25) then
             return S.EyeBeam:Cast()
         end
         -- fel_barrage,if=((!cooldown.eye_beam.up|buff.metamorphosis.up)&raid_event.adds.in>30)|active_enemies>desired_targets

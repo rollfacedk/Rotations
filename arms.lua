@@ -214,15 +214,15 @@ local function APL()
             return S.MortalStrike:Cast()
         end
         -- execute,if=buff.deadly_calm.up
-        if S.Execute:IsCastableP() and (Player:BuffP(S.DeadlyCalmBuff)) then
+        if S.Execute:IsReadyMorph() and (Player:BuffP(S.DeadlyCalmBuff)) then
             return S.Cleave:Cast()
         end
         -- overpower
         if S.Overpower:IsReady() then
             return S.Overpower:Cast()
         end
-        -- execute,if=buff.deadly_calm.up
-        if S.Execute:IsReadyMorph() and Player:BuffP(S.DeadlyCalmBuff)  then
+        -- execute
+        if S.Execute:IsReadyMorph()  then
             return S.Execute:Cast()
         end
         return 0, 135328

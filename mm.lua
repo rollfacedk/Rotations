@@ -112,9 +112,38 @@ end
 
 local ShouldReturn; -- Used to get the return string
 
+local OffensiveCDs = {
+    S.Berserking,
+    S.BloodFury,
+    S.AncestralCall,
+    S.Fireblood,
+    S.LightsJudgment,
+    S.Trueshot,
+    S.DoubleTap,
+}
+
+local function UpdateCDs()
+    if RubimRH.CDsON() then
+        for i, spell in pairs(OffensiveCDs) do
+            if not spell:IsEnabledCD() then
+                RubimRH.delSpellDisabledCD(spell:ID())
+            end
+        end
+
+    end
+    if not RubimRH.CDsON() then
+        for i, spell in pairs(OffensiveCDs) do
+            if spell:IsEnabledCD() then
+                RubimRH.addSpellDisabledCD(spell:ID())
+            end
+        end
+    end
+end
+
 local function APL ()
     local Precombat, Cds, St, Trickshots
     UpdateRanges()
+    UpdateCDs()
 
 
 

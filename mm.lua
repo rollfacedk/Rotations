@@ -50,7 +50,7 @@ RubimRH.Spell[254] = {
 
     --CUSTOM
     Exhilaration = Spell(109304),
-    AspectoftheTurtle = Spell(186256),
+    AspectoftheTurtle = Spell(186265),
     CounterShot = Spell(147362),
     
 }
